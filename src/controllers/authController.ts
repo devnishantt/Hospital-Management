@@ -64,3 +64,19 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   res.clearCookie("refreshToken");
   sendSuccess(res, null, "Logout successful", STATUS_CODES.OK);
 });
+
+export const refreshToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const token = req.body.refreshToken || req.cookies?.refreshToken;
+    const tokens = await authService.refreshTokens(token);
+
+    res.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    sendSuccess(res, {accessToken:tokens.accessToken}, "Token refreshed", STATUS_CODES.OK)
+  },
+);

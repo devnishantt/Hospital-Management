@@ -6,8 +6,10 @@ import { sendWelcomeEmail } from "../utils/helpers/email";
 import {
   blacklistToken,
   generateTokenPair,
+  getStoredRefreshToken,
   removeRefreshToken,
   storeRefreshToken,
+  verifyRefreshToken,
 } from "../utils/helpers/jwt";
 import bcrypt from "bcrypt";
 import { verifyTotpToken } from "../utils/helpers/totp";
@@ -119,5 +121,31 @@ export default class AuthService {
     await removeRefreshToken(userId);
     await userRepo.updateRefreshToken(userId, null);
     logger.info(`User ${userId} logged out.`);
+  }
+
+  async refreshTokens(refreshToken: string): Promise<TokenPair> {
+    const decoded = verifyRefreshToken(refreshToken);
+
+    const storedToken = await getStoredRefreshToken(decoded.id);
+    if (!storedToken || storedToken !== refreshToken) {
+      throw new UnauthorizedError(
+        "Refresh token is invalid or has been revoked.",
+      );
+    }
+
+    const user = await userRepo.findById(decoded.id);
+    if (!user.isActive) throw new UnauthorizedError("Account is deactivated");
+
+    const payload: JwtPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
+    const tokens = generateTokenPair(payload);
+
+    await storeRefreshToken(user.id, tokens.refreshToken);
+    await userRepo.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
   }
 }

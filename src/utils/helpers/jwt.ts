@@ -69,3 +69,17 @@ export async function verifyAccessToken(token: string): Promise<JwtPayload> {
     throw new UnauthorizedError("Invalid or expired access token");
   }
 }
+
+export function verifyRefreshToken(token: string): JwtPayload {
+  try {
+    return jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
+  } catch (error) {
+    throw new UnauthorizedError("Invalid or expired refresh token.");
+  }
+}
+
+export async function getStoredRefreshToken(
+  userId: string,
+): Promise<string | null> {
+  return redis.get(`${REFRESH_TOKEN_PREFIX}${userId}`);
+}
