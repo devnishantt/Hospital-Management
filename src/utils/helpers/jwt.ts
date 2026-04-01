@@ -7,7 +7,10 @@ import {
 } from "../../config/serverConfig";
 import { JwtPayload, TokenPair } from "../../types";
 import jwt, { Secret } from "jsonwebtoken";
-import { REFRESH_TOKEN_PREFIX } from "../common/constants";
+import {
+  JWT_BLACKLIST_PREFIX,
+  REFRESH_TOKEN_PREFIX,
+} from "../common/constants";
 
 export function generateTokenPair(payload: JwtPayload): TokenPair {
   const accessToken = jwt.sign(payload, JWT_ACCESS_SECRET, {
@@ -35,4 +38,20 @@ export async function storeRefreshToken(
     ttlSeconds,
     refreshToken,
   );
+}
+
+export async function blacklistToken(token: string): Promise<void> {
+  try {
+    const decoded = jwt.decode(token) as jwt.JwtPayload | null;
+    if (!decoded?.exp) return;
+
+    const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+    if (ttl > 0) {
+      await redis.setex(`${JWT_BLACKLIST_PREFIX}${token}`, ttl, "1");
+    }
+  } catch {}
+}
+
+export async function removeRefreshToken(userId: string): Promise<void> {
+  await redis.del(`${REFRESH_TOKEN_PREFIX}${userId}`);
 }

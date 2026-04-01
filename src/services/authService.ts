@@ -1,9 +1,17 @@
 import AuditLogRepository from "../repositories/auditLogRepository";
 import UserRepository from "../repositories/userRepository";
 import { JwtPayload, TokenPair } from "../types";
-import { ConflictError } from "../utils/errors/error";
+import { ConflictError, UnauthorizedError } from "../utils/errors/error";
 import { sendWelcomeEmail } from "../utils/helpers/email";
-import { generateTokenPair, storeRefreshToken } from "../utils/helpers/jwt";
+import {
+  blacklistToken,
+  generateTokenPair,
+  removeRefreshToken,
+  storeRefreshToken,
+} from "../utils/helpers/jwt";
+import bcrypt from "bcrypt";
+import { verifyTotpToken } from "../utils/helpers/totp";
+import logger from "../config/loggerConfig";
 
 const userRepo = new UserRepository();
 const auditLogRepo = new AuditLogRepository();
@@ -56,5 +64,60 @@ export default class AuthService {
     } = user;
 
     return { user: safeUser, tokens };
+  }
+
+  async login(
+    email: string,
+    password: string,
+    totpToken?: string,
+  ): Promise<{ user: any; tokens: TokenPair; requireTotp?: boolean }> {
+    const user = await userRepo.findByEmail(email);
+    if (!user) throw new UnauthorizedError("Invalid email or password.");
+    if (!user.isActive) {
+      throw new UnauthorizedError("Account is deactivated. Contact admin.");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new UnauthorizedError("Invalid email or password.");
+
+    if (user.isTotpEnabled) {
+      if (!totpToken) {
+        return {
+          user: { id: user.id },
+          tokens: { accessToken: "", refreshToken: "" },
+          requireTotp: true,
+        };
+      }
+      if (!user.totpSecret || !verifyTotpToken(totpToken, user.totpSecret)) {
+        throw new UnauthorizedError("Invalid TOTP token.");
+      }
+    }
+
+    const payload: JwtPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    };
+    const tokens = generateTokenPair(payload);
+
+    await storeRefreshToken(user.id, tokens.refreshToken);
+    await userRepo.updateRefreshToken(user.id, tokens.refreshToken);
+    await userRepo.updateLastLogin(user.id);
+
+    const {
+      password: _,
+      refreshToken: __,
+      totpSecret: ___,
+      ...safeUser
+    } = user;
+
+    return { user: safeUser, tokens };
+  }
+
+  async logout(userId: string, accessToken: string): Promise<void> {
+    await blacklistToken(accessToken);
+    await removeRefreshToken(userId);
+    await userRepo.updateRefreshToken(userId, null);
+    logger.info(`User ${userId} logged out.`);
   }
 }

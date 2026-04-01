@@ -27,6 +27,15 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class ForbiddenError extends AppError {
+  constructor(
+    message: string = "Access denied. Insufficient permissions.",
+    details: any = {},
+  ) {
+    super(message, 403, details);
+  }
+}
+
 export class NotFoundError extends AppError {
   constructor(message: string = "Resource not found", details: any = {}) {
     super(message, 404, details);
@@ -36,6 +45,15 @@ export class NotFoundError extends AppError {
 export class ConflictError extends AppError {
   constructor(message: string = "Resource already exists", details: any = {}) {
     super(message, 409, details);
+  }
+}
+
+export class TooManyRequestsError extends AppError {
+  constructor(
+    message: string = "Too many requests, please try again later.",
+    details: any = {},
+  ) {
+    super(message, 429, details);
   }
 }
 

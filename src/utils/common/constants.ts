@@ -1,4 +1,5 @@
 export const REFRESH_TOKEN_PREFIX = "rt:";
+export const JWT_BLACKLIST_PREFIX = "bl:";
 
 export const STATUS_CODES = {
   OK: 200,
