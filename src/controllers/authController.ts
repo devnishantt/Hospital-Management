@@ -77,6 +77,25 @@ export const refreshToken = asyncHandler(
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    sendSuccess(res, {accessToken:tokens.accessToken}, "Token refreshed", STATUS_CODES.OK)
+    sendSuccess(
+      res,
+      { accessToken: tokens.accessToken },
+      "Token refreshed",
+      STATUS_CODES.OK,
+    );
+  },
+);
+
+export const changePassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split(" ")[1] || "";
+    await authService.changePassword(
+      req.user!.id,
+      req.body.currentPassword,
+      req.body.newPassword,
+      token,
+    );
+    res.clearCookie("refreshToken");
+    sendSuccess(res, null, "Password changed successfully", STATUS_CODES.OK);
   },
 );
