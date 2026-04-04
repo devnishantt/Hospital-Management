@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { BCRYPT_SALT_ROUND, DATABASE_URL, NODE_ENV } from "./serverConfig";
+import { BCRYPT_SALT_ROUND, DATABASE_URL, NODE_ENV } from "./envKeys";
 import { PrismaClient } from "../generated/prisma/client";
 import bcrypt from "bcrypt";
 import logger from "./loggerConfig";

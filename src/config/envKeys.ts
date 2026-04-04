@@ -26,3 +26,5 @@ export const SMTP_FROM_NAME =
   process.env.SMTP_FROM_NAME || "Hospital Management";
 export const SMTP_FROM_EMAIL =
   process.env.SMTP_FROM_EMAIL || "noreply@hospital.com";
+  
+export const TOTP_ISSUER = process.env.TOTP_ISSUER || "HospitalManagement";
