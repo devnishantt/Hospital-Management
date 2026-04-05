@@ -1,5 +1,6 @@
 import AuditLogRepository from "../repositories/auditLogRepository";
 import UserRepository from "../repositories/userRepository";
+import { PaginationParams } from "../types";
 import { uploadToCloudinary } from "../utils/helpers/cloudinary";
 
 const userRepo = new UserRepository();
@@ -56,4 +57,26 @@ export default class UserService {
     await userRepo.updateAvatar(userId, result.secure_url);
     return { avatarUrl: result.secure_url };
   }
+
+  async listUsers(params:PaginationParams, filters:{role?:string; isActive?:boolean}={}){
+    const where: any = {}
+    if(filters.role) where.role = filters.role
+    if(filters.isActive !== undefined) where.isActive = filters.isActive 
+
+    return userRepo.findWithPagination(params, where, {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        gender: true,
+        role: true,
+        avatarUrl: true,
+        isActive: true,
+        lastLogin: true,
+        createdAt: true,
+      },
+    });
+  }
 }
+

@@ -22,3 +22,30 @@ export const STATUS_CODES = {
 } as const;
 
 export type StatusCode = (typeof STATUS_CODES)[keyof typeof STATUS_CODES];
+
+export const PAGINATION_DEFAULTS = {
+  PAGE: 1,
+  LIMIT: 10,
+  MAX_LIMIT: 100,
+  SORT_ORDER: "desc" as const,
+};
+
+export const UPLOAD_LIMITS = {
+  IMAGE_MAX_SIZE: 5 * 1024 * 1024,
+  DOCUMENT_MAX_SIZE: 10 * 1024 * 1024,
+  ALLOWED_IMAGE_TYPES: ["image/jpeg", "image/png", "image/webp"],
+  ALLOWED_DOC_TYPES: [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ],
+};
+
+export const ROLES = {
+  USER: "USER",
+  DOCTOR: "DOCTOR",
+  ADMIN: "ADMIN",
+} as const;
+
+export type Role = (typeof ROLES)[keyof typeof ROLES];
