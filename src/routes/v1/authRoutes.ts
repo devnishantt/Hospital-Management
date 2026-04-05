@@ -10,11 +10,12 @@ import {
   verifyTotp,
 } from "../../controllers/authController";
 import { authenticate } from "../../middlewares/authMiddleware";
+import { authLimiter } from "../../middlewares/rateLimitMiddleware";
 
 const authRouter = Router();
 
-authRouter.post("/register", register);
-authRouter.post("/login", login);
+authRouter.post("/register", authLimiter, register);
+authRouter.post("/login", authLimiter, login);
 authRouter.post("/refresh-token", refreshToken);
 
 authRouter.post("/logout", authenticate, logout);
