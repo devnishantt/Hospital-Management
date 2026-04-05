@@ -1,5 +1,6 @@
 import AuditLogRepository from "../repositories/auditLogRepository";
 import UserRepository from "../repositories/userRepository";
+import { uploadToCloudinary } from "../utils/helpers/cloudinary";
 
 const userRepo = new UserRepository();
 const auditLogRepo = new AuditLogRepository();
@@ -37,7 +38,22 @@ export default class UserService {
     data: { name?: string; phone?: string; gender?: string },
   ) {
     const user = await userRepo.update(userId, data);
-    const { password: _, refreshToken: __, totpSecret: ___, ...safeUser } = user;
-    return safeUser
+    const {
+      password: _,
+      refreshToken: __,
+      totpSecret: ___,
+      ...safeUser
+    } = user;
+    return safeUser;
+  }
+
+  async uploadAvatar(userId: string, fileBuffer: Buffer) {
+    const result = await uploadToCloudinary(
+      fileBuffer,
+      "avatars",
+      `user-${userId}`,
+    );
+    await userRepo.updateAvatar(userId, result.secure_url);
+    return { avatarUrl: result.secure_url };
   }
 }

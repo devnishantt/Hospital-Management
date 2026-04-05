@@ -26,5 +26,10 @@ export const SMTP_FROM_NAME =
   process.env.SMTP_FROM_NAME || "Hospital Management";
 export const SMTP_FROM_EMAIL =
   process.env.SMTP_FROM_EMAIL || "noreply@hospital.com";
-  
+
 export const TOTP_ISSUER = process.env.TOTP_ISSUER || "HospitalManagement";
+
+
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || "";
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || "";
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET || "";
