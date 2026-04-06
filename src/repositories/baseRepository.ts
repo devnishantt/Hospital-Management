@@ -135,4 +135,12 @@ export default class BaseRepository<T = any> {
       handlePrismaError(error, this.modelName, "paginated fetch");
     }
   }
+
+  async count(where: any = {}): Promise<number> {
+    try {
+      return await this.model.count({ where });
+    } catch (error) {
+      handlePrismaError(error, this.modelName, "counting");
+    }
+  }
 }
