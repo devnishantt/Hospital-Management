@@ -143,4 +143,12 @@ export default class BaseRepository<T = any> {
       handlePrismaError(error, this.modelName, "counting");
     }
   }
+
+  async transaction<R>(fn: (tx: any) => Promise<R>): Promise<R> {
+    try {
+      return await (prisma as any).$transaction(fn);
+    } catch (error) {
+      handlePrismaError(error, this.modelName, "transaction");
+    }
+  }
 }

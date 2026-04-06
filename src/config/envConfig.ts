@@ -40,3 +40,8 @@ export const RATE_LIMIT_WINDOW_MS = parseInt(
 export const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX || "100", 10);
 
 export const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
+
+export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || "";
+export const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || "";
+export const RAZORPAY_WEBHOOK_SECRET =
+  process.env.RAZORPAY_WEBHOOK_SECRET || "";

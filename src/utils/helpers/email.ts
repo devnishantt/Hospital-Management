@@ -67,3 +67,28 @@ export async function sendAppointmentConfirmation(
     `,
   });
 }
+
+export async function sendPaymentReceiptEmail(
+  to: string,
+  patientName: string,
+  amount: number,
+  transactionId: string,
+  date: string,
+): Promise<boolean> {
+  return sendMail({
+    to,
+    subject: "Payment Receipt — Hospital Management",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2563eb;">Payment Receipt</h2>
+        <p>Dear ${patientName},</p>
+        <p>Your payment has been received successfully.</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+          <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Amount</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">₹${(amount / 100).toFixed(2)}</td></tr>
+          <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Transaction ID</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${transactionId}</td></tr>
+          <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Date</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${date}</td></tr>
+        </table>
+      </div>
+    `,
+  });
+}
