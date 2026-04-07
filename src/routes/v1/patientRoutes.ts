@@ -9,16 +9,32 @@ import {
   listPatients,
   updatePatient,
 } from "../../controllers/patientController";
+import {
+  createPatientSchema,
+  updatePatientSchema,
+} from "../../validators/patientValidator";
+import validate from "../../middlewares/validateMiddleware";
+import { uuidParamSchema } from "../../validators/commonValidator";
 
 const patientRouter = Router();
 
 patientRouter.use(authenticate);
 
-patientRouter.post("/", createPatient);
+patientRouter.post("/", validate(createPatientSchema), createPatient);
 patientRouter.get("/me", getMyPatientProfile);
-patientRouter.get("/:id", getPatient);
-patientRouter.patch("/:id", updatePatient);
+patientRouter.get("/:id", validate(uuidParamSchema, "params"), getPatient);
+patientRouter.patch(
+  "/:id",
+  validate(uuidParamSchema, "params"),
+  validate(updatePatientSchema),
+  updatePatient,
+);
 patientRouter.get("/", authorize("ADMIN", "DOCTOR"), listPatients);
-patientRouter.delete("/:id", authorize("ADMIN"), deletePatient);
+patientRouter.delete(
+  "/:id",
+  authorize("ADMIN"),
+  validate(uuidParamSchema, "params"),
+  deletePatient,
+);
 
 export default patientRouter;

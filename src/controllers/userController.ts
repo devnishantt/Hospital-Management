@@ -43,3 +43,25 @@ export const listUsers = asyncHandler(async (req: Request, res: Response) => {
   const users = await userService.listUsers(params, filters);
   sendSuccess(res, users, "Users fetched", STATUS_CODES.OK);
 });
+
+export const updateUserRole = asyncHandler(
+  async (req: Request, res: Response) => {
+    const user = await userService.updateUserRole(
+      req.user!.id,
+      req.params.id as string,
+      req.body.role,
+    );
+    sendSuccess(res, user, "User role updated", STATUS_CODES.OK);
+  },
+);
+
+export const updateUserStatus = asyncHandler(
+  async (req: Request, res: Response) => {
+    const user = await userService.updateUserStatus(
+      req.user!.id,
+      req.params.id as string,
+      req.body.isActive,
+    );
+    sendSuccess(res, user, "User status updated", STATUS_CODES.OK);
+  },
+);

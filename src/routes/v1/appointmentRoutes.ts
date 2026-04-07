@@ -11,21 +11,43 @@ import {
   updateStatus,
 } from "../../controllers/appointmentController";
 import { authorize } from "../../middlewares/rbacMiddleware";
+import validate from "../../middlewares/validateMiddleware";
+import {
+  createAppointmentSchema,
+  rescheduleAppointmentSchema,
+  updateAppointmentStatusSchema,
+} from "../../validators/appointmentValidator";
+import { uuidParamSchema } from "../../validators/commonValidator";
 
 const appointmentRouter = Router();
 
 appointmentRouter.use(authenticate);
 
-appointmentRouter.post("/", bookAppointment);
+appointmentRouter.post("/", validate(createAppointmentSchema), bookAppointment);
 appointmentRouter.get("/me", getMyAppointments);
-appointmentRouter.get("/:id", getAppointment);
+appointmentRouter.get(
+  "/:id",
+  validate(uuidParamSchema, "params"),
+  getAppointment,
+);
 appointmentRouter.patch(
   "/:id/status",
   authorize("ADMIN", "DOCTOR"),
+  validate(uuidParamSchema, "params"),
+  validate(updateAppointmentStatusSchema),
   updateStatus,
 );
-appointmentRouter.patch("/:id/reschedule", reschedule);
-appointmentRouter.patch("/:id/cancel", cancelAppointment);
+appointmentRouter.patch(
+  "/:id/reschedule",
+  validate(uuidParamSchema, "params"),
+  validate(rescheduleAppointmentSchema),
+  reschedule,
+);
+appointmentRouter.patch(
+  "/:id/cancel",
+  validate(uuidParamSchema, "params"),
+  cancelAppointment,
+);
 appointmentRouter.get(
   "/doctor/:doctorId",
   authorize("ADMIN", "DOCTOR"),
