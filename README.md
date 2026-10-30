@@ -1,5 +1,7 @@
 #  Hospital Management System — Backend API
 
+[![CI](https://github.com/devnishantt/Hospital-Management/actions/workflows/ci.yml/badge.svg)](https://github.com/devnishantt/Hospital-Management/actions/workflows/ci.yml)
+
 A production-grade, fully-featured Hospital Management System backend built with modern TypeScript patterns and a clean layered architecture.
 
 ##  Features
